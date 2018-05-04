@@ -63,6 +63,10 @@ impl Universe {
         (row * self.width + column) as usize
     }
 
+    fn get_row_column(&self, index: usize) -> (u32, u32) {
+        (index as u32 / self.width, index as u32 % self.width)
+    }
+
     fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
         let mut count = 0;
         for delta_row in [self.height - 1, 0, 1].iter().cloned() {
@@ -81,20 +85,14 @@ impl Universe {
     }
 
     pub fn tick(&mut self) {
-        let mut next = self.cells.clone();
-
-        for row in 0..self.height {
-            for col in 0..self.width {
-                let i = self.get_index(row, col);
-                let n = self.live_neighbor_count(row, col);
-                next[i] = match (self.cells[i], n) {
-                    (Cell::Alive, 2) | (_, 3) => Cell::Alive,
-                    _ => Cell::Dead,
-                };
+        self.cells = self.cells.iter().enumerate().map(|(i, cell)| {
+            let (row, col) = self.get_row_column(i);
+            let n = self.live_neighbor_count(row, col);
+            match (cell, n) {
+                (Cell::Alive, 2) | (_, 3) => Cell::Alive,
+                _ => Cell::Dead,
             }
-        }
-
-        self.cells = next;
+        }).collect();
     }
 }
 
