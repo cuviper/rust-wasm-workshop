@@ -10,6 +10,9 @@ use wasm_bindgen::prelude::*;
 extern {
     #[wasm_bindgen(js_namespace = console)]
     fn log(msg: &str);
+
+    #[wasm_bindgen(js_namespace = Math)]
+    fn random() -> f64;
 }
 
 // A macro to provide `println!(..)`-style syntax for `console.log` logging.
@@ -40,7 +43,7 @@ impl Universe {
 
         let cells = (0..width * height)
             .map(|i| {
-                if i % 2 == 0 || i % 7 == 0 {
+                if random() < 0.5 {
                     Cell::Alive
                 } else {
                     Cell::Dead
